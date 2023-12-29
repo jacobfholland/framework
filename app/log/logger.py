@@ -1,8 +1,9 @@
 import logging
 import os
-import coloredlogs
-from app.config import conf
 
+import coloredlogs
+
+from app.config import conf
 
 LOG_LEVELS = {
     "DEBUG": logging.DEBUG,
@@ -36,7 +37,6 @@ def create_handler(name):
 
 
 def create_handlers(name):
-    print(conf.APP_NAME)
     file_handler = create_handler(name)
     app_file_handler = create_handler("all")
     return [file_handler, app_file_handler]

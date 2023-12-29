@@ -1,8 +1,10 @@
-from dotenv import load_dotenv
-from pathlib import Path
+import logging
 import os
-from app.utils.validate import validate
+from pathlib import Path
 
+from dotenv import load_dotenv
+
+from app.utils.validate import validate
 
 INITIAL_ENV = dict(os.environ)
 
@@ -22,4 +24,4 @@ class Environment:
     def load_env_files(self):
         for env_file in self.get_env_files():
             load_dotenv(env_file, override=True)
-            print(f"Loaded configuration from {env_file}")
+            logging.warning(f"Loaded configuration from {env_file}")
