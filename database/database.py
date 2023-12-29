@@ -2,11 +2,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from alembic import command
-from alembic.autogenerate import compare_metadata
 from alembic.config import Config
 from alembic.runtime.migration import MigrationContext
+from alembic.autogenerate.api import compare_metadata
 
-from .logger import logger
+from app.log.logger import create_logger
+
+
+logger = create_logger("database.database")
 
 
 class Database:
@@ -17,30 +20,35 @@ class Database:
         self.session = sessionmaker(bind=self.engine)()
 
         # Ensure the database is up-to-date with the latest migrations
-        # self.upgrade_database()
+        self.sync_schema()
 
         logger.debug("Database initialized successfully")
 
-    def upgrade_database(self):
+    def sync_schema(self):
         alembic_cfg = Config("alembic.ini")
-
-        # Check for changes in the schema
-        if self.has_schema_changes(alembic_cfg):
-            command.revision(alembic_cfg, autogenerate=True,
-                             message="Auto-generated migration")
-
-        # Upgrade the database to the latest revision
-        command.upgrade(alembic_cfg, "head")
-
-    def has_schema_changes(self, alembic_cfg):
-        # Get the current database metadata
         connection = self.engine.connect()
         context = MigrationContext.configure(connection)
-        current_metadata = self.base.metadata
-        current_metadata.reflect(self.engine)
 
-        # Compare current metadata with the metadata from the models
-        diff = compare_metadata(context, current_metadata)
+        # Compare the current database schema with the model definitions
+        diff = compare_metadata(context, self.base.metadata)
+
+        if diff:
+            # If there are differences, autogenerate a migration script
+            command.revision(alembic_cfg, autogenerate=True,
+                             message="Auto-generated migration for schema sync")
+            # Apply the migration to the database
+            command.upgrade(alembic_cfg, "head")
+        else:
+            logger.info("No schema changes detected.")
+
+        connection.close()
+
+    def has_schema_changes(self, alembic_cfg):
+        # This function may be redundant now as we're handling it in sync_schema
+        connection = self.engine.connect()
+        context = MigrationContext.configure(connection)
+
+        diff = compare_metadata(context, self.base.metadata)
 
         connection.close()
         return len(diff) > 0

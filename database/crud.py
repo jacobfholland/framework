@@ -1,10 +1,10 @@
 from datetime import datetime
 from sqlalchemy import and_, or_
-from sqlalchemy import event
 
 from app import app
+from app.log.logger import create_logger
 
-from .logger import logger
+logger = create_logger("database.crud")
 
 
 class Crud:
@@ -79,6 +79,28 @@ class Crud:
             if not quiet_log:
                 logger.info(
                     f"Successfully created {self.__class__.__name__} with ID: {self.id}")
+        except Exception as e:
+            logger.error(
+                f"{type(e)} Creation failed for {self.__class__.__name__}: {e}")
+            app.db.session.rollback()
+
+    def create_not_exists(self, quiet_log=False, **values):
+        try:
+            if not quiet_log:
+                logger.debug(
+                    f"Attempting to create {self.__class__.__name__} with attributes: {values}")
+            existing = self.get(quiet_log=True, **values).all()
+            if not existing:
+                record = self.__class__(**values)
+                app.db.session.add(record)
+                app.db.session.commit()
+                if not quiet_log:
+                    logger.info(
+                        f"Successfully created {self.__class__.__name__} with ID: {self.id}")
+            else:
+                if not quiet_log:
+                    logger.info(
+                        f"Record already exists {self.__class__.__name__} with ID: {existing[0].id}")
         except Exception as e:
             logger.error(
                 f"{type(e)} Creation failed for {self.__class__.__name__}: {e}")

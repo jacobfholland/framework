@@ -2,9 +2,10 @@ from bcrypt import checkpw, gensalt, hashpw
 from sqlalchemy import Column, Integer, String
 
 from app import app
+from app.log.logger import create_logger
 from app.utils.generate import generate_uuid
 
-from .logger import logger
+logger = create_logger("auth.user")
 
 session_store = {}
 
@@ -20,39 +21,13 @@ try:
             def __repr__(self):
                 return f"<User(name={self.name})>"
 
-            def hash_password(password):
-                return hashpw(password.encode('utf-8'), gensalt())
+            def seeds(self):
+                from .seeds import system
+                return system
 
-            def check_password_hash(password, hash):
-                return checkpw(password.encode('utf-8'), hash)
-
-            def create_session(user_id):
-                session_id = generate_uuid()
-                session_store[session_id] = {'user_id': user_id}
-                return session_id
-
-            def get_current_session_id():
-                # Implement your method to retrieve the current session ID, usually from the request cookie
-                pass
-
-            def invalidate_session(session_id):
-                if session_id in session_store:
-                    del session_store[session_id]
-
-            def login(self, username, password):
-                user = self.query.filter_by(username=username).first()
-                if user and self.check_password_hash(user.password, password):
-                    # Create session and return success
-                    session_id = self.create_session(user.id)
-                    return True, session_id  # or a more secure token
-                return False, None
-
-            def logout(self):
-                session_id = self.get_current_session_id()  # Implement this
-                if session_id:
-                    self.invalidate_session(session_id)
-                    return True
-                return False
+            def create_not_exists(self, quiet_log=False, **values):
+                del values["password"]
+                return super().create_not_exists(quiet_log, **values)
 
         logger.debug(f"User model imported")
 except Exception as e:

@@ -4,17 +4,21 @@ from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.ext.declarative import declared_attr
 
 from app import app
+from app.log.logger import create_logger
 from app.utils.format import snake_case
 from app.utils.generate import generate_uuid
 
 from .base import Base
-from .logger import logger
+
+
+logger = create_logger("database.model")
 
 try:
     if app.conf.DATABASE:
-        from database.crud import Crud
+        from .crud import Crud
+        from .seed import Seed
 
-        class Model(Base, Crud):
+        class Model(Base, Crud, Seed):
             __table_args__ = {'extend_existing': True}
             __abstract__ = True
 
@@ -49,32 +53,12 @@ try:
                 serialized_data = {}
                 for column in self.__table__.columns:
                     attribute = getattr(self, column.name)
-                    # Check if the attribute is a date or datetime and convert to string.
                     if isinstance(attribute, (datetime, date)):
                         serialized_data[column.name] = attribute.isoformat()
                     else:
                         serialized_data[column.name] = attribute
                 return serialized_data
 
-            def seed(self):
-                seeds = [
-                    {
-                        "name": "System",
-                        "username": "System",
-                        "password": "password123"
-                    },
-                    {
-                        "name": "Administrator",
-                        "username": "Administrator",
-                        "password": "password123"
-                    }
-                ]
-                for seed in seeds:
-                    existing = self.get(quiet_log=True, **seed).all()
-                    if not existing:
-                        record = self.__class__(**seed)
-                        record.create(quiet_log=True)
-
 
 except Exception as e:
-    logger.warning("Unable to import base model")
+    logger.warning(f"Unable to import base model: {e}")
