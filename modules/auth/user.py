@@ -23,7 +23,7 @@ try:
             def hash_password(password):
                 return hashpw(password.encode('utf-8'), gensalt())
 
-            def check_password_hash(hash, password):
+            def check_password_hash(password, hash):
                 return checkpw(password.encode('utf-8'), hash)
 
             def create_session(user_id):

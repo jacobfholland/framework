@@ -5,7 +5,15 @@ if app.conf.DATABASE:
     if app.conf.AUTH:
         from modules.auth.user import User
 
-user = User().get(name="updated_name").first()
-user.update(name="updated_name", password="omg")
-user.update({"name": "updated_name", "password": "poopies"})
-print(vars(user))
+# User(name="jacob", username="ndysu", password="test123").create()
+users = User().get(strict=False).all()
+for user in users:
+    # user.update(name="updated_name", password="omg")
+    user.delete()
+
+User().seed()
+# users.archive()
+
+# user.update(name="updated_name", password="omg")
+# user.update({"name": "updated_name", "password": "poopies"})
+# print(vars(users))

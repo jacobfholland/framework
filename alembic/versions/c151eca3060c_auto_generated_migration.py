@@ -1,18 +1,18 @@
 """Auto-generated migration
 
-Revision ID: 0e62222aea1a
+Revision ID: c151eca3060c
 Revises: 
-Create Date: 2023-12-28 02:31:52.389021
+Create Date: 2023-12-29 00:13:37.374995
 
 """
 from typing import Sequence, Union
 
+from alembic import op
 import sqlalchemy as sa
 
-from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = '0e62222aea1a'
+revision: str = 'c151eca3060c'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -25,7 +25,7 @@ def upgrade() -> None:
     sa.Column('uuid', sa.String(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('active', sa.Boolean(), nullable=True),
+    sa.Column('deleted_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('user',
@@ -36,7 +36,7 @@ def upgrade() -> None:
     sa.Column('uuid', sa.String(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('active', sa.Boolean(), nullable=True),
+    sa.Column('deleted_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
