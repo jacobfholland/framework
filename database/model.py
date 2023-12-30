@@ -7,6 +7,7 @@ from app import app
 from app.log.logger import create_logger
 from app.utils.format import snake_case
 from app.utils.generate import generate_uuid
+from app.utils.printable import Printable
 
 from .base import Base
 
@@ -17,7 +18,7 @@ try:
         from .crud import Crud
         from .seed import Seed
 
-        class Model(Base, Crud, Seed):
+        class Model(Base, Crud, Seed, Printable):
             __table_args__ = {'extend_existing': True}
             __abstract__ = True
 
@@ -44,12 +45,18 @@ try:
                 return snake_case(cls.__name__)
 
             def __init__(self, **kwargs):
-                for kwarg in kwargs:
-                    if hasattr(self, kwarg):
-                        setattr(self, kwarg, kwargs[kwarg])
+                self.update_values(kwargs)
+
+            def update_values(self, values):
+                data = {}
+                data.update(self.__dict__)
+                data.update(values)
+                for k, v in data.items():
+                    if hasattr(self, k):
+                        setattr(self, k, v)
                     else:
                         logger.warning(
-                            f"Key {kwarg} does not exist on {self.__class__.__name__} model")
+                            f"Key {k} does not exist on {self.__class__.__name__} model")
 
             def serialize(self):
                 serialized_data = {}

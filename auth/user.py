@@ -3,11 +3,9 @@ from sqlalchemy import Column, Integer, String
 
 from app import app
 from app.log.logger import create_logger
-from app.utils.generate import generate_uuid
 
 logger = create_logger("auth.user")
 
-session_store = {}
 
 try:
     if app.conf.DATABASE and app.conf.AUTH:
@@ -18,9 +16,6 @@ try:
             username = Column(String)
             password = Column(String)
             avatar = Column(String)
-
-            def __repr__(self):
-                return f"<User(name={self.name})>"
 
             def seeds(self):
                 from .seeds import system

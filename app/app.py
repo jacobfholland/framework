@@ -7,10 +7,6 @@ class Application:
         self.conf = conf
         self.logger = logger
 
-    # def init_db(self, init_db):
-    #     import database
-    #     database.db = init_db.session
-
     def init_db(self, init_db):
         if self.conf.DATABASE:
             import database

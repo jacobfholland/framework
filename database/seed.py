@@ -7,7 +7,7 @@ logger = create_logger("database.seed")
 
 class Seed:
 
-    @disable_logging
+    # @disable_logging
     def seed(self):
         logger.debug(
             f"Seeding {self.__class__.__name__} model table '{self.__class__.__tablename__}'")

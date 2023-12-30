@@ -66,17 +66,6 @@ class Crud:
             logger.error(
                 f"{type(e)} Failed to retrieve {self.__class__.__name__} due to: {e}")
 
-    def update_values(self, values):
-        data = {}
-        data.update(self.__dict__)
-        data.update(values)
-        for k, v in data.items():
-            if hasattr(self, k):
-                setattr(self, k, v)
-            else:
-                logger.warning(
-                    f"Key {k} does not exist on {self.__class__.__name__} model")
-
     def create(self, **values):
         try:
             logger.debug(
