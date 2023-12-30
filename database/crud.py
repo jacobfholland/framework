@@ -22,6 +22,13 @@ class Crud:
                 f"Building filter for {self.__class__.__name__} with {log_condition.__name__} conditions: {conditions_str}")
         return log_condition(*conditions)
 
+    def update_filters(self, *args, **filters):
+        if "deleted_at" not in filters:
+            filters["deleted_at"] = None
+        if len(args) == 1 and isinstance(args[0], dict):
+            filters.update(args[0])
+        return filters
+
     def query(self, strict=True, quiet_log=False, **filters):
         filter_conditions = self.filter(
             strict=strict, quiet_log=quiet_log, **filters)
@@ -30,13 +37,6 @@ class Crud:
             logger.debug(
                 f"Constructed query for {self.__class__.__name__}: {query}")
         return query
-
-    def update_filters(self, *args, **filters):
-        if "deleted_at" not in filters:
-            filters["deleted_at"] = None
-        if len(args) == 1 and isinstance(args[0], dict):
-            filters.update(args[0])
-        return filters
 
     def get(self, *args, strict=True, quiet_log=False, **filters):
         try:
@@ -69,11 +69,21 @@ class Crud:
             logger.error(
                 f"{type(e)} Failed to retrieve {self.__class__.__name__} due to: {e}")
 
-    def create(self, quiet_log=False):
+    def create(self, quiet_log=False, **values):
         try:
             if not quiet_log:
                 logger.debug(
                     f"Attempting to create {self.__class__.__name__} with attributes: {vars(self)}")
+            data = {}
+            data.update(self.__dict__)
+            data.update(values)
+
+            for k, v in data.items():
+                if hasattr(self, k):
+                    setattr(self, k, v)
+                else:
+                    logger.warning(
+                        f"Key {k} does not exist on {self.__class__.__name__} model")
             app.db.session.add(self)
             app.db.session.commit()
             if not quiet_log:

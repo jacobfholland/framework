@@ -17,6 +17,7 @@ try:
             name = Column(String)
             username = Column(String)
             password = Column(String)
+            avatar = Column(String)
 
             def __repr__(self):
                 return f"<User(name={self.name})>"

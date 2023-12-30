@@ -48,6 +48,9 @@ try:
                 for kwarg in kwargs:
                     if hasattr(self, kwarg):
                         setattr(self, kwarg, kwargs[kwarg])
+                    else:
+                        logger.warning(
+                            f"Key {kwarg} does not exist on {self.__class__.__name__} model")
 
             def serialize(self):
                 serialized_data = {}

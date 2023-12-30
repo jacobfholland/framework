@@ -4,42 +4,13 @@ import os
 import coloredlogs
 
 from app.config import conf
-
-LOG_LEVELS = {
-    "DEBUG": logging.DEBUG,
-    "INFO": logging.INFO,
-    "WARNING": logging.WARNING,
-    "CRITICAL": logging.CRITICAL,
-    "ERROR": logging.ERROR
-}
-FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-FORMATTER = logging.Formatter(FORMAT)
-LOG_LEVEL = conf.LOG_LEVEL.upper()
-
-
-def configure_external_loggers():
-    # Retrieve the loggers for Alembic and SQLAlchemy
-    alembic_logger = logging.getLogger('alembic')
-    sqlalchemy_logger = logging.getLogger('sqlalchemy')
-
-    # Set the logging level for these loggers
-    alembic_logger.setLevel(logging.WARNING)
-    sqlalchemy_logger.setLevel(logging.WARNING)
-
-    # Apply the same handlers and formatter you use for your main logger
-    for handler in logging.getLogger().handlers:
-        alembic_logger.addHandler(handler)
-        sqlalchemy_logger.addHandler(handler)
-
-    # Optionally, if you want to apply colored logs to these loggers
-    coloredlogs.install(level="WARNING", logger=alembic_logger, fmt=FORMAT)
-    coloredlogs.install(level="WARNING", logger=sqlalchemy_logger, fmt=FORMAT)
+from app.log.format import FORMAT, FORMATTER
+from app.log.level import LOG_LEVEL, LOG_LEVELS
 
 
 def create_logger(name):
     if not os.path.exists(conf.LOG_PATH):
         os.makedirs(conf.LOG_PATH)
-    configure_external_loggers()
     logger = logging.getLogger(name)
     logger.setLevel(LOG_LEVELS.get(LOG_LEVEL))
     coloredlogs.install(level=LOG_LEVEL, logger=logger, fmt=FORMAT)
