@@ -7,21 +7,20 @@ from alembic.runtime.migration import MigrationContext
 from alembic.autogenerate.api import compare_metadata
 
 from app.log.logger import create_logger
-
+from .base import Base
 
 logger = create_logger("database.database")
 
 
 class Database:
-    def __init__(self, Base, uri) -> None:
+    def __init__(self, uri) -> None:
+        import auth  # TODO: Make this dynamicly import
+        import modules
         self.base = Base
         self.engine = create_engine(uri)
         self.base.metadata.create_all(bind=self.engine)
         self.session = sessionmaker(bind=self.engine)()
-
-        # Ensure the database is up-to-date with the latest migrations
         self.sync_schema()
-
         logger.debug("Database initialized successfully")
 
     def sync_schema(self):

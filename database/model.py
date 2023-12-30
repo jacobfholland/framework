@@ -10,7 +10,6 @@ from app.utils.generate import generate_uuid
 
 from .base import Base
 
-
 logger = create_logger("database.model")
 
 try:

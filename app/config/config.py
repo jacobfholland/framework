@@ -10,6 +10,7 @@ class Config:
         self.LOG_LEVEL = "INFO"
         self.LOG_PATH = "logs"
         self.DATABASE = False
+        self.AUTH = False
         self.bind_environment_variables(env)
 
     def bind_environment_variables(self, env):

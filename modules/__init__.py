@@ -1,1 +1,1 @@
-from . import auth, movie
+from . import movie

@@ -26,9 +26,13 @@ try:
                 from .seeds import system
                 return system
 
-            def create_not_exists(self, quiet_log=False, **values):
+            def create_not_exists(self, **values):
                 del values["password"]
-                return super().create_not_exists(quiet_log, **values)
+                return super().create_not_exists(**values)
+
+            def create(self, **values):
+                # Hash the password
+                super().create(**values)
 
         logger.debug(f"User model imported")
 except Exception as e:
