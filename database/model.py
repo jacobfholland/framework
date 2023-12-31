@@ -20,7 +20,7 @@ try:
     class Model(Base, Crud, Seed, Printable):
         __table_args__ = {'extend_existing': True}
         __abstract__ = True
-
+        _name = __name__
         id = Column(Integer, primary_key=True)
         uuid = Column(String, default=generate_uuid)
         created_at = Column(

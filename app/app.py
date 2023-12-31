@@ -14,5 +14,9 @@ class Application:
 
     def init_auth(self):
         import auth
+
+        from auth.permission import Permission
+        Permission().seed()
+
         from auth.user import User
         User().seed()
