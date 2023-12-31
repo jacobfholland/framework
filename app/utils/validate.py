@@ -37,3 +37,8 @@ def validate_json(value):
         return json.loads(value), True
     except json.JSONDecodeError:
         return None, False
+
+
+def validate_model(value):
+    """Check if the value is a SQLAlchemy model instance."""
+    return hasattr(value, '__table__')

@@ -7,6 +7,8 @@ from app.log.logger import create_logger
 from app.utils.format import snake_case
 from app.utils.generate import generate_uuid
 from app.utils.printable import Printable
+from app.utils.validate import validate_model
+from sqlalchemy.inspection import inspect
 
 from .base import Base
 from .crud import Crud
@@ -46,16 +48,19 @@ try:
         def __init__(self, **kwargs):
             self.update_values(kwargs)
 
+        def get_relationship_names(self):
+            """Get a list of relationship attribute names for the model."""
+            mapper = inspect(self.__class__)
+            return [rel.key for rel in mapper.relationships]
+
         def update_values(self, values):
-            data = {}
-            data.update(self.__dict__)
-            data.update(values)
-            for k, v in data.items():
-                if hasattr(self, k):
-                    setattr(self, k, v)
+            data = {**self.__dict__, **values}
+            for key, value in data.items():
+                if hasattr(self, key):
+                    setattr(self, key, value)
                 else:
                     logger.warning(
-                        f"Key {k} does not exist on {self.__class__.__name__} model")
+                        f"Key {key} does not exist on {self.__class__.__name__} model")
 
         def serialize(self):
             serialized_data = {}

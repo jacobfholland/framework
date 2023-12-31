@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy import and_, or_
-
+from sqlalchemy.inspection import inspect
 from app.log.logger import create_logger
 from app.utils.log import disable_logging
 
@@ -23,13 +23,6 @@ class Crud:
             f"Building filter for {self.__class__.__name__} with {log_condition.__name__} conditions: {conditions_str}")
         return log_condition(*conditions)
 
-    def update_filters(self, *args, **filters):
-        if "deleted_at" not in filters:
-            filters["deleted_at"] = None
-        if len(args) == 1 and isinstance(args[0], dict):
-            filters.update(args[0])
-        return filters
-
     def query(self, strict=True, **filters):
         filter_conditions = self.filter(
             strict=strict, **filters)
@@ -39,13 +32,30 @@ class Crud:
             f"Constructed query for {self.__class__.__name__}: {query}")
         return query
 
+    def update_filters(self, *args, **filters):
+        if "deleted_at" not in filters:
+            filters["deleted_at"] = None
+        if len(args) == 1 and isinstance(args[0], dict):
+            filters.update(args[0])
+        return filters
+
+    def strip_relationships(self, filters):
+        # TODO: Make this only remove model objects, not entire field
+        # This will allow searching for relationship type fields
+        relationships = self.get_relationship_names()
+        strip_relationships = {}
+        for k, v in filters.items():
+            if not k in relationships:
+                strip_relationships[k] = v
+        return strip_relationships
+
     def get(self, *args, strict=True, **filters):
         try:
             filters = self.update_filters(*args, **filters)
+            filters = self.strip_relationships(filters)
             logger.debug(
                 f"Retrieving {self.__class__.__name__} with filters: {filters}")
             query = self.query(strict=strict, **filters)
-
             results = query.all()
             result_count = len(results)
 
@@ -75,6 +85,7 @@ class Crud:
             database.session.commit()
             logger.info(
                 f"Successfully created {self.__class__.__name__} with ID: {self.id}")
+            return self
         except Exception as e:
             logger.error(
                 f"{type(e)} Creation failed for {self.__class__.__name__}: {e}")
@@ -84,6 +95,8 @@ class Crud:
         try:
             logger.debug(
                 f"Attempting to create {self.__class__.__name__} with attributes: {values}")
+            self.update_values(values)
+
             existing = self.get(**values).all()
             if not existing:
                 record = self.__class__(**values)
@@ -91,9 +104,11 @@ class Crud:
                 database.session.commit()
                 logger.info(
                     f"Successfully created {self.__class__.__name__} with ID: {self.id}")
+                return record
             else:
                 logger.info(
                     f"Record already exists {self.__class__.__name__} with ID: {existing[0].id}")
+                return self
         except Exception as e:
             logger.error(
                 f"{type(e)} Creation failed for {self.__class__.__name__}: {e}")
@@ -127,6 +142,7 @@ class Crud:
             database.session.commit()
             logger.info(
                 f"Successfully deleted {self.__class__.__name__} with ID: {self.id}")
+            return self
         except Exception as e:
             logger.error(
                 f"{type(e)} Deletion failed for {self.__class__.__name__}: {e}")
@@ -140,6 +156,7 @@ class Crud:
             database.session.commit()
             logger.info(
                 f"Successfully archived {self.__class__.__name__} with ID: {self.id}")
+            return self
         except Exception as e:
             logger.error(
                 f"{type(e)} Archiving failed for {self.__class__.__name__}: {e}")
