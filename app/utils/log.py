@@ -1,6 +1,6 @@
 import logging
 
-from app.log.level import LOG_LEVELS, LOG_LEVEL
+from app.log.level import LOG_LEVEL, LOG_LEVELS
 
 
 def disable_logging(func):

@@ -1,10 +1,11 @@
 from datetime import datetime
+
 from sqlalchemy import and_, or_
 from sqlalchemy.inspection import inspect
-from app.log.logger import create_logger
-from app.utils.log import disable_logging
 
 import database
+from app.log.logger import create_logger
+from app.utils.log import disable_logging
 
 logger = create_logger(__name__)
 
@@ -104,11 +105,11 @@ class Crud:
                 database.session.commit()
                 logger.info(
                     f"Successfully created {self.__class__.__name__} with ID: {self.id}")
-                return record
             else:
+                record = existing
                 logger.info(
-                    f"Record already exists {self.__class__.__name__} with ID: {existing[0].id}")
-                return self
+                    f"Record already exists {self.__class__.__name__} with ID: {record[0].id}")
+            return record
         except Exception as e:
             logger.error(
                 f"{type(e)} Creation failed for {self.__class__.__name__}: {e}")

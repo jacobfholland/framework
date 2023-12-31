@@ -2,11 +2,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from alembic import command
+from alembic.autogenerate.api import compare_metadata
 from alembic.config import Config
 from alembic.runtime.migration import MigrationContext
-from alembic.autogenerate.api import compare_metadata
-
 from app.log.logger import create_logger
+
 from .base import Base
 
 logger = create_logger(__name__)

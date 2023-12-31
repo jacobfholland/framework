@@ -1,19 +1,18 @@
-from datetime import datetime, date
+from datetime import date, datetime
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.inspection import inspect
 
 from app.log.logger import create_logger
 from app.utils.format import snake_case
 from app.utils.generate import generate_uuid
 from app.utils.printable import Printable
 from app.utils.validate import validate_model
-from sqlalchemy.inspection import inspect
 
 from .base import Base
 from .crud import Crud
 from .seed import Seed
-
 
 logger = create_logger(__name__)
 

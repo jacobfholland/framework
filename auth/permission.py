@@ -1,9 +1,13 @@
-from app.log.logger import create_logger
-from database.model import Model
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Boolean, Column, Integer, String
 # from .seeds import permission
 from sqlalchemy.orm import relationship
+
+from app.log.logger import create_logger
+from app.utils.log import disable_logging
+from database.model import Model
+
 from .pivot import permission_group
+
 logger = create_logger(__name__)
 
 

@@ -1,6 +1,6 @@
 import logging
-from app.config import conf
 
+from app.config import conf
 
 LOG_LEVELS = {
     "DEBUG": logging.DEBUG,

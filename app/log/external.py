@@ -1,5 +1,7 @@
 import logging
+
 import coloredlogs
+
 from app.log.format import FORMAT, FORMATTER
 
 

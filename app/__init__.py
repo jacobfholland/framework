@@ -1,8 +1,7 @@
 import logging
 
-
 try:
-    from . import utils, config, log, app
+    from . import app, config, log, utils
 except Exception as e:
     logging.error(f"Failed to import app module: {e}")
 

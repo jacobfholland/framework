@@ -1,8 +1,10 @@
-from database.model import Model
 from bcrypt import checkpw, gensalt, hashpw
 from sqlalchemy import Column, Integer, String
 
 from app.log.logger import create_logger
+from app.utils.log import disable_logging
+from database.model import Model
+
 from .seeds import system
 
 logger = create_logger(__name__)

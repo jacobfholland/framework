@@ -1,12 +1,22 @@
-from auth.permission import Permission
-from .pivot import permission_group
-from app.log.logger import create_logger
-from database.model import Model
-from sqlalchemy import Column, Integer, String, Boolean
-from .seeds import permission
+from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.orm import relationship
 
+from app.log.logger import create_logger
+from app.utils.log import disable_logging
+from auth.permission import Permission
+from database.model import Model
+
+from .pivot import permission_group
+from .seeds import permission
+
 logger = create_logger(__name__)
+
+FULL_CONTROL = {
+    "create": True,
+    "read": True,
+    "update": True,
+    "delete": True
+}
 
 
 class Group(Model):
@@ -20,10 +30,9 @@ class Group(Model):
         return super().create_not_exists(**values)
 
     def seeds(self):
-
         return [
             {
                 "name": "System",
-                "permissions": Permission().get().all()
+                "permissions": Permission().get(**FULL_CONTROL).all()
             }
         ]

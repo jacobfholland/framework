@@ -11,10 +11,10 @@ class Application:
     def init_db(self, init_db, name="session"):
         import database
         setattr(database, name, init_db.session)
+        setattr(database, "db", init_db)
 
     def init_auth(self):
         import auth
-
         from auth.permission import Permission
         Permission().seed()
 
