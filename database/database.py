@@ -9,7 +9,7 @@ from alembic.autogenerate.api import compare_metadata
 from app.log.logger import create_logger
 from .base import Base
 
-logger = create_logger("database.database")
+logger = create_logger(__name__)
 
 
 class Database:
@@ -19,7 +19,6 @@ class Database:
         self.base.metadata.create_all(bind=self.engine)
         self.session = sessionmaker(bind=self.engine)()
         self.sync_schema()
-        logger.debug("Database initialized successfully")
 
     def sync_schema(self):
         logger.debug("Beginning database schema sync")
@@ -40,7 +39,6 @@ class Database:
             command.upgrade(alembic_cfg, "head")
         else:
             logger.info("No database schema changes detected.")
-        logger.debug("Database schema sync complete")
         connection.close()
 
     def has_schema_changes(self, alembic_cfg):

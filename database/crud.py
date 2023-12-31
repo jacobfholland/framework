@@ -6,7 +6,7 @@ from app.utils.log import disable_logging
 
 import database
 
-logger = create_logger("database.crud")
+logger = create_logger(__name__)
 
 
 class Crud:

@@ -4,7 +4,7 @@ from sqlalchemy import Column, Integer, String
 
 from app.log.logger import create_logger
 
-logger = create_logger("auth.user")
+logger = create_logger(__name__)
 
 
 class User(Model):

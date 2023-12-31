@@ -13,7 +13,7 @@ from .crud import Crud
 from .seed import Seed
 
 
-logger = create_logger("database.model")
+logger = create_logger(__name__)
 
 try:
 
