@@ -2,10 +2,8 @@ from app.log.logger import create_logger
 logger = create_logger("auth.init")
 
 try:
+    logger.debug(f"Importing module components: Movie")
     from . import movie
-    logger.debug(f"Movie model imported")
-
-    # from . import seeds
-    # logger.debug(f"Movie seeds imported")
+    logger.debug(f"Module components successfully imported: Movie")
 except Exception as e:
-    logger.warning(f"Unable to import Movie module")
+    logger.warning(f"Failed to import module: Movie")

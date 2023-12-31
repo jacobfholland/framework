@@ -4,7 +4,7 @@ from app.log import logger
 
 class Application:
     def __init__(self) -> None:
-        import modules
+
         self.conf = conf
         self.logger = logger
 

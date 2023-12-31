@@ -14,8 +14,6 @@ logger = create_logger("database.database")
 
 class Database:
     def __init__(self, uri) -> None:
-        import auth  # TODO: Make this dynamicly import
-        import modules
         self.base = Base
         self.engine = create_engine(uri)
         self.base.metadata.create_all(bind=self.engine)

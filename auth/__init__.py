@@ -2,10 +2,9 @@ from app.log.logger import create_logger
 logger = create_logger("auth.init")
 
 try:
+    logger.debug(f"Importing module components: Auth")
     from . import user
-    logger.debug(f"User model imported")
-
     from . import seeds
-    logger.debug(f"Auth seeds imported")
+    logger.debug(f"Module components successfully imported: Auth")
 except Exception as e:
-    logger.warning(f"Unable to import Auth module")
+    logger.warning(f"Failed to import module: Auth")
