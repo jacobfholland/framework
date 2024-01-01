@@ -98,8 +98,8 @@ class Crud:
     def create(self, *args, **values):
         try:
             logger.debug(
-                f"Attempting to create {self.__class__.__name__} with attributes: {vars(self)}")
-            update_kwargs(*args, **values)
+                f"Creating {self.__class__.__name__} with attributes: {vars(self)}")
+            values = update_kwargs(*args, **values)
             bind_values(self, values)
             database.session.add(self)
             database.session.commit()
@@ -111,24 +111,14 @@ class Crud:
                 f"{type(e)} Creation failed for {self.__class__.__name__}: {e}")
             database.session.rollback()
 
-    def create_not_exists(self, **values):
+    def create_not_exists(self, filters, *args, **values):
         try:
             logger.debug(
-                f"Attempting to create {self.__class__.__name__} with attributes: {values}")
-            bind_values(values)
-
-            existing = self.get(**values).all()
+                f"Attempting to create {self.__class__.__name__} if not exists with filters: {filters}, attributes: {values}")
+            values = update_kwargs(*args, **values)
+            existing = self.get(**filters).all()
             if not existing:
-                record = self.__class__(**values)
-                database.session.add(record)
-                database.session.commit()
-                logger.info(
-                    f"Successfully created {self.__class__.__name__} with ID: {self.id}")
-            else:
-                record = existing
-                logger.info(
-                    f"Record already exists {self.__class__.__name__} with ID: {record[0].id}")
-            return record
+                self.__class__().create(**values)
         except Exception as e:
             logger.error(
                 f"{type(e)} Creation failed for {self.__class__.__name__}: {e}")
@@ -136,13 +126,8 @@ class Crud:
 
     def update(self, *args, **values):
         try:
-            if len(args) == 1 and isinstance(args[0], dict):
-                values.update(args[0])
-                logger.debug(
-                    f"Attempting to update {self.__class__.__name__} with values: {values}")
-            for key, value in values.items():
-                if hasattr(self, key):
-                    setattr(self, key, value)
+            values = update_kwargs(*args, **values)
+            bind_values(self, values)
             database.session.commit()
             logger.info(
                 f"Successfully updated {self.__class__.__name__} with ID: {self.id}")

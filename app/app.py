@@ -16,12 +16,22 @@ class Application:
 
     def init_auth(self):
         import auth
-        import database
-        from database.filter import Filter
-        from database.query import Query
-        logger.critical("+++++++++++++++++++++++++++++++++++++++++++++++++++")
-        from auth.group import Group
         from auth.permission import Permission
+        from auth.group import Group
+        from auth.user import User
+        from database.seed import Seed
+        logger.critical(
+            "++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+        Permission().seed()
+        Group().seed()
+        User().seed()
+        # name = "User"
+        # permissions = Permission().get().all()
+        # seed = {"name": name, "permissions": permissions}
 
-        filters = {"name": "System", "permissions.id": [1, 2]}
-        group = Group().get(filters).all()
+        # existing = Group().get(name="User").all()
+        # if not existing:
+        #     records_ids = []
+        #     for record in permissions:
+        #         records_ids.append(record.id)
+        #     group = Group().create(**seed)

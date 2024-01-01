@@ -5,25 +5,34 @@ from app.log.logger import create_logger
 from app.utils.log import disable_logging
 from database.model import Model
 
-from .seeds import system
 
 logger = create_logger(__name__)
 
 
 class User(Model):
     _name = "auth.user"
+    _seed_key = "name"
     name = Column(String)
     username = Column(String)
     password = Column(String)
     avatar = Column(String)
 
-    def seeds(self):
-        return system
-
-    def create_not_exists(self, **values):
-        del values["password"]
-        return super().create_not_exists(**values)
-
     def create(self, **values):
         # Hash the password
         super().create(**values)
+
+    def seeds(self):
+        return [
+            {
+                "name": "System",
+                "username": "System",
+                "password": "password123",
+                "avatar": "/home/jacob/imgs/avatar.jpg"
+            },
+            {
+                "name": "Administrator",
+                "username": "Administrator",
+                "password": "password123",
+                "avatar": "/home/jacob/imgs/avatar.jpg"
+            }
+        ]

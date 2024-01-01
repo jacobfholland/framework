@@ -5,13 +5,11 @@ logger = create_logger(__name__)
 
 
 class Seed:
-
-    # @disable_logging
-    def seed(self):
-        logger.info(
-            f"Seeding {self.__class__.__name__} model table '{self.__class__.__tablename__}'")
-        for seed in self.seeds():
-            record = self.create_not_exists(**seed)
-
     def seeds(self):
         return []
+
+    def seed(self):
+        if self._seed_key:
+            for record in self.seeds():
+                filters = {self._seed_key: record.get(self._seed_key)}
+                self.__class__().create_not_exists(filters, **record)

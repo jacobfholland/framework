@@ -11,31 +11,20 @@ from .pivot import permission_group
 
 logger = create_logger(__name__)
 
-FULL_CONTROL = {
-    "create": True,
-    "read": True,
-    "update": True,
-    "delete": True
-}
-
-print("GROUP")
-
 
 class Group(Model):
-
+    _name = "auth.group"
+    _seed_key = "name"
     name = Column(String)
     permissions = relationship(
         "Permission", secondary=permission_group, back_populates="groups"
     )
 
-    def create_not_exists(self, **values):
-        return super().create_not_exists(**values)
-
     def seeds(self):
-
+        permissions = Permission().get().all()
         return [
             {
-                "name": "System",
-                "permissions": Permission().get(**FULL_CONTROL).all()
+                "name": "Bubble222s",
+                "permissions": permissions
             }
         ]

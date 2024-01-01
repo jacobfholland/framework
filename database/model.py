@@ -23,6 +23,7 @@ try:
         __table_args__ = {'extend_existing': True}
         __abstract__ = True
         _name = __name__
+        _seed_key = None
         id = Column(Integer, primary_key=True)
         uuid = Column(String, default=generate_uuid)
         created_at = Column(

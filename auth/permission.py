@@ -11,12 +11,13 @@ logger = create_logger(__name__)
 
 
 class Permission(Model):
-    name = Column(String)
+    _name = "auth.permission"
+    _seed_key = "name"
     model = Column(String)
-    read = Column(Boolean, default=True)
-    create = Column(Boolean)
-    update = Column(Boolean)
-    delete = Column(Boolean)
+    model_get = Column(Boolean, default=True)
+    model_create = Column(Boolean)
+    model_update = Column(Boolean)
+    model_delete = Column(Boolean)
     groups = relationship(
         "Group", secondary=permission_group, back_populates="permissions"
     )
@@ -24,19 +25,27 @@ class Permission(Model):
     def seeds(self):
         return [
             {
-                "name": "auth.permission",
-                "model": "auth.permission",
-                "create": True,
-                "read": True,
-                "update": True,
-                "delete": True,
-            },
-            {
                 "name": "auth.group",
                 "model": "auth.group",
-                "create": True,
-                "read": True,
-                "update": True,
-                "delete": True,
+                "model_create": True,
+                "model_get": True,
+                "model_update": True,
+                "model_delete": True,
+            },
+            {
+                "name": "auth.permission",
+                "model": "auth.permission",
+                "model_create": True,
+                "model_get": True,
+                "model_update": True,
+                "model_delete": True,
+            },
+            {
+                "name": "auth.user",
+                "model": "auth.user",
+                "model_create": True,
+                "model_get": True,
+                "model_update": True,
+                "model_delete": True,
             }
         ]
