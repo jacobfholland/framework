@@ -27,4 +27,4 @@ class Application:
 
         records = database.session.query(
             Group).filter(or_(*filter.filter)).all()
-        print(vars(filter))
+        print(filter)

@@ -1,11 +1,12 @@
 from sqlalchemy import or_
 
+from app.utils.printable import Printable
 
-class Filter:
+
+class Filter(Printable):
     def __init__(self, cls, **data) -> None:
         self.filter = []
         self.cls = cls
-
         for key, value in data.items():
             attribute_parts = key.split(".")
             if len(attribute_parts) == 2 and self.is_relationship(attribute_parts[0]):
