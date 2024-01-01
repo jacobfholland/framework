@@ -23,8 +23,5 @@ class Application:
         from auth.group import Group
         from auth.permission import Permission
 
-        data = {"name": "System", "permissions.id": [1, 2]}
-        # filter = Filter(Group, **data)
-        # query = Query(filter, and_)
-
-        print(Group().get(data, "or").all())
+        filters = {"name": "System", "permissions.id": [1, 2]}
+        group = Group().get(filters).all()

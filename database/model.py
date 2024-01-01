@@ -53,15 +53,6 @@ try:
             mapper = inspect(self.__class__)
             return [rel.key for rel in mapper.relationships]
 
-        # def bind_values(self, values):
-        #     data = {**self.__dict__, **values}
-        #     for key, value in data.items():
-        #         if hasattr(self, key):
-        #             setattr(self, key, value)
-        #         else:
-        #             logger.warning(
-        #                 f"Key {key} does not exist on {self.__class__.__name__} model")
-
         def serialize(self):
             serialized_data = {}
             for column in self.__table__.columns:

@@ -2,6 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import and_, or_
 from sqlalchemy.inspection import inspect
+from app.utils.bind import bind_values, update_kwargs
 
 import database
 from app.log.logger import create_logger
@@ -63,45 +64,43 @@ class Crud:
 
     def get(self, *args, func=and_, **filters):
         try:
-            # filters.update(self.__dict__)
-            if len(args) == 1 and isinstance(args[0], dict):
-                filters.update(args[0])
+
+            # filters.update(self.__dict__) # Add values from current model
+            filters = update_kwargs(*args, **filters)
             filter = Filter(self.__class__, **filters)
             func = select_func(func)
             query = Query(filter, func)
+            logger.debug(
+                f"Retrieving {self.__class__.__name__} with filter: {filter}")
+            self.log_results(query)
             return query.results
-            # filters = self.update_filters(*args, **filters)
-            # print(filters)
-            # # filters = self.strip_relationships(filters)
-
-            # logger.debug(
-            #     f"Retrieving {self.__class__.__name__} with filters: {filters}")
-            # query = self.query(strict=strict, **filters)
-            # results = query.all()
-            # result_count = len(results)
-
-            # if result_count > 1:
-            #     ids = [str(result.id) for result in results]
-            #     logger.info(
-            #         f"Multiple ({result_count}) {self.__class__.__name__} instances retrieved with IDs: {ids}")
-            # elif result_count == 1:
-            #     logger.debug(
-            #         f"Retrieved record {self.__class__.__name__} with ID: {vars(results[0])}")
-            #     logger.info(
-            #         f"Successfully retrieved {self.__class__.__name__} with ID: {results[0].id}")
-            # else:
-            #     logger.warning(
-            #         f"No {self.__class__.__name__} instances found with the provided filters.")
-            # return query
         except Exception as e:
             logger.error(
                 f"{type(e)} Failed to retrieve {self.__class__.__name__} due to: {e}")
 
-    def create(self, **values):
+    def log_results(self, query):
+        results = query.results.all()
+        result_count = len(results)
+
+        if result_count > 1:
+            ids = [str(result.id) for result in results]
+            logger.info(
+                f"Multiple ({result_count}) {self.__class__.__name__} instances retrieved with IDs: {ids}")
+        elif result_count == 1:
+            logger.debug(
+                f"Successfully retrieved record {self.__class__.__name__}: {vars(results[0])}")
+            logger.info(
+                f"Successfully retrieved {self.__class__.__name__} with ID: {results[0].id}")
+        else:
+            logger.warning(
+                f"No {self.__class__.__name__} instances found with the provided filters.")
+
+    def create(self, *args, **values):
         try:
             logger.debug(
                 f"Attempting to create {self.__class__.__name__} with attributes: {vars(self)}")
-            self.update_values(values)
+            update_kwargs(*args, **values)
+            bind_values(self, values)
             database.session.add(self)
             database.session.commit()
             logger.info(
@@ -116,7 +115,7 @@ class Crud:
         try:
             logger.debug(
                 f"Attempting to create {self.__class__.__name__} with attributes: {values}")
-            self.update_values(values)
+            bind_values(values)
 
             existing = self.get(**values).all()
             if not existing:
