@@ -1,4 +1,4 @@
-from sqlalchemy.orm import contains_eager
+from sqlalchemy import or_
 
 
 class Filter:
@@ -9,29 +9,46 @@ class Filter:
         for key, value in data.items():
             attribute_parts = key.split(".")
             if len(attribute_parts) == 2 and self.is_relationship(attribute_parts[0]):
-                # Handle relationship attributes.
                 self.handle_relationship(attribute_parts, value)
             elif hasattr(cls, key):
-                # Handle direct attributes.
-                self.filter.append(getattr(cls, key) == value)
-        print(self.filter)
-        for filter in self.filter:
-            print(vars(filter), "\n")
+                self.handle_direct_attribute(key, value)
 
     def is_relationship(self, attr):
         return hasattr(getattr(self.cls, attr, None), 'property')
+
+    def handle_direct_attribute(self, key, value):
+        """Handle filters for direct attributes."""
+        if isinstance(value, list):
+            # If the value is a list, create an OR condition for each value in the list
+            conditions = [getattr(self.cls, key) == v for v in value]
+            self.filter.append(or_(*conditions))
+        else:
+            # If the value is not a list, create a simple equality filter
+            self.filter.append(getattr(self.cls, key) == value)
 
     def handle_relationship(self, key_parts, value):
         """Handle filters for relationships."""
         relationship_name, attribute_name = key_parts
         relationship_attr = getattr(self.cls, relationship_name)
 
-        # Check if it's a collection relationship (one-to-many or many-to-many)
         if relationship_attr.property.uselist:
-            # Create a condition where any member of the collection matches the criterion
-            condition = relationship_attr.any(**{attribute_name: value})
-            self.filter.append(condition)
+            if isinstance(value, list):
+                # Create an OR condition for each value in the list
+                conditions = [relationship_attr.any(
+                    **{attribute_name: v}) for v in value]
+                self.filter.append(or_(*conditions))
+            else:
+                # Create a condition where any member of the collection matches the criterion
+                condition = relationship_attr.any(**{attribute_name: value})
+                self.filter.append(condition)
         else:
-            # For one-to-one relationships, directly compare the attribute.
-            related_cls = relationship_attr.property.mapper.class_
-            self.filter.append(getattr(related_cls, attribute_name) == value)
+            if isinstance(value, list):
+                # For a one-to-one relationship with a list of values, use OR
+                conditions = [getattr(
+                    relationship_attr.property.mapper.class_, attribute_name) == v for v in value]
+                self.filter.append(or_(*conditions))
+            else:
+                # For one-to-one relationships, directly compare the attribute
+                related_cls = relationship_attr.property.mapper.class_
+                self.filter.append(
+                    getattr(related_cls, attribute_name) == value)

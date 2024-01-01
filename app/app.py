@@ -1,3 +1,4 @@
+from sqlalchemy import or_
 from app.config import conf
 from app.log import logger
 
@@ -15,8 +16,15 @@ class Application:
 
     def init_auth(self):
         import auth
+        import database
         from database.filter import Filter
         logger.critical("+++++++++++++++++++++++++++++++++++++++++++++++++++")
-        data = {"name": "System", "permissions.id": 1}
         from auth.group import Group
+        from auth.permission import Permission
+
+        data = {"name": "System", "permissions.id": [1, 2]}
         filter = Filter(Group, **data)
+
+        records = database.session.query(
+            Group).filter(or_(*filter.filter)).all()
+        print(vars(filter))
