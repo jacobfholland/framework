@@ -18,7 +18,7 @@ except Exception as e:
 
 try:
     logger.debug(f"Importing module components: Database")
-    from . import base, filter, crud, database, model, seed
+    from . import utils, base, filter, query, crud, database, model, seed
 except Exception as e:
     logger.error(f"Failed to initialize the database: {e}")
 

@@ -6,6 +6,9 @@ from sqlalchemy.inspection import inspect
 import database
 from app.log.logger import create_logger
 from app.utils.log import disable_logging
+from database.filter import Filter
+from database.query import Query
+from database.utils import select_func
 
 logger = create_logger(__name__)
 
@@ -58,31 +61,38 @@ class Crud:
                 strip_relationships[k] = v
         return strip_relationships
 
-    def get(self, *args, strict=True, **filters):
+    def get(self, *args, func=and_, **filters):
         try:
-            filters = self.update_filters(*args, **filters)
-            print(filters)
-            # filters = self.strip_relationships(filters)
+            # filters.update(self.__dict__)
+            if len(args) == 1 and isinstance(args[0], dict):
+                filters.update(args[0])
+            filter = Filter(self.__class__, **filters)
+            func = select_func(func)
+            query = Query(filter, func)
+            return query.results
+            # filters = self.update_filters(*args, **filters)
+            # print(filters)
+            # # filters = self.strip_relationships(filters)
 
-            logger.debug(
-                f"Retrieving {self.__class__.__name__} with filters: {filters}")
-            query = self.query(strict=strict, **filters)
-            results = query.all()
-            result_count = len(results)
+            # logger.debug(
+            #     f"Retrieving {self.__class__.__name__} with filters: {filters}")
+            # query = self.query(strict=strict, **filters)
+            # results = query.all()
+            # result_count = len(results)
 
-            if result_count > 1:
-                ids = [str(result.id) for result in results]
-                logger.info(
-                    f"Multiple ({result_count}) {self.__class__.__name__} instances retrieved with IDs: {ids}")
-            elif result_count == 1:
-                logger.debug(
-                    f"Retrieved record {self.__class__.__name__} with ID: {vars(results[0])}")
-                logger.info(
-                    f"Successfully retrieved {self.__class__.__name__} with ID: {results[0].id}")
-            else:
-                logger.warning(
-                    f"No {self.__class__.__name__} instances found with the provided filters.")
-            return query
+            # if result_count > 1:
+            #     ids = [str(result.id) for result in results]
+            #     logger.info(
+            #         f"Multiple ({result_count}) {self.__class__.__name__} instances retrieved with IDs: {ids}")
+            # elif result_count == 1:
+            #     logger.debug(
+            #         f"Retrieved record {self.__class__.__name__} with ID: {vars(results[0])}")
+            #     logger.info(
+            #         f"Successfully retrieved {self.__class__.__name__} with ID: {results[0].id}")
+            # else:
+            #     logger.warning(
+            #         f"No {self.__class__.__name__} instances found with the provided filters.")
+            # return query
         except Exception as e:
             logger.error(
                 f"{type(e)} Failed to retrieve {self.__class__.__name__} due to: {e}")

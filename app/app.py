@@ -1,4 +1,4 @@
-from sqlalchemy import or_
+from sqlalchemy import and_, or_
 from app.config import conf
 from app.log import logger
 
@@ -18,13 +18,13 @@ class Application:
         import auth
         import database
         from database.filter import Filter
+        from database.query import Query
         logger.critical("+++++++++++++++++++++++++++++++++++++++++++++++++++")
         from auth.group import Group
         from auth.permission import Permission
 
         data = {"name": "System", "permissions.id": [1, 2]}
-        filter = Filter(Group, **data)
+        # filter = Filter(Group, **data)
+        # query = Query(filter, and_)
 
-        records = database.session.query(
-            Group).filter(or_(*filter.filter)).all()
-        print(filter)
+        print(Group().get(data, "or").all())
