@@ -1,4 +1,5 @@
 import json
+from sqlalchemy.inspection import inspect
 
 
 def validate(value):
@@ -42,3 +43,8 @@ def validate_json(value):
 def validate_model(value):
     """Check if the value is a SQLAlchemy model instance."""
     return hasattr(value, '__table__')
+
+
+def validate_relationship(obj, attr):
+    mapper = inspect(type(obj.obj))
+    return attr in mapper.relationships

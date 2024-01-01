@@ -3,11 +3,11 @@ from sqlalchemy.orm import relationship
 
 from app.log.logger import create_logger
 from app.utils.log import disable_logging
-from auth.permission import Permission
-from database.model import Model
 
+from database.model import Model
+from auth.permission import Permission
 from .pivot import permission_group
-from .seeds import permission
+
 
 logger = create_logger(__name__)
 
@@ -17,6 +17,8 @@ FULL_CONTROL = {
     "update": True,
     "delete": True
 }
+
+print("GROUP")
 
 
 class Group(Model):
@@ -30,6 +32,7 @@ class Group(Model):
         return super().create_not_exists(**values)
 
     def seeds(self):
+
         return [
             {
                 "name": "System",

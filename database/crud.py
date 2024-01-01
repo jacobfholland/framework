@@ -25,10 +25,13 @@ class Crud:
         return log_condition(*conditions)
 
     def query(self, strict=True, **filters):
+        # print("++++++++++++", filters)
         filter_conditions = self.filter(
             strict=strict, **filters)
+
         query = database.session.query(
             self.__class__).filter(filter_conditions)
+        print("++++++++++++", query)
         logger.debug(
             f"Constructed query for {self.__class__.__name__}: {query}")
         return query
@@ -38,6 +41,11 @@ class Crud:
             filters["deleted_at"] = None
         if len(args) == 1 and isinstance(args[0], dict):
             filters.update(args[0])
+
+        # for k, v in filters.items():
+        #     if hasattr(v, "__table__"):
+        #         filters[k] = v.id
+
         return filters
 
     def strip_relationships(self, filters):
@@ -53,7 +61,9 @@ class Crud:
     def get(self, *args, strict=True, **filters):
         try:
             filters = self.update_filters(*args, **filters)
-            filters = self.strip_relationships(filters)
+            print(filters)
+            # filters = self.strip_relationships(filters)
+
             logger.debug(
                 f"Retrieving {self.__class__.__name__} with filters: {filters}")
             query = self.query(strict=strict, **filters)

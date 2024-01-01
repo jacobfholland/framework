@@ -15,14 +15,8 @@ class Application:
 
     def init_auth(self):
         import auth
-        from auth.permission import Permission
-        Permission().seed()
-
-        from auth.group import Group
-        Group().seed()
-
-        from auth.user import User
-        User().seed()
-
+        from database.filter import Filter
         logger.critical("+++++++++++++++++++++++++++++++++++++++++++++++++++")
-        Group(name="testing", permissions=Permission().get().all()).create()
+        data = {"name": "System", "permissions.id": 1}
+        from auth.group import Group
+        filter = Filter(Group, **data)

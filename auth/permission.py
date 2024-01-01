@@ -1,5 +1,4 @@
 from sqlalchemy import Boolean, Column, Integer, String
-# from .seeds import permission
 from sqlalchemy.orm import relationship
 
 from app.log.logger import create_logger

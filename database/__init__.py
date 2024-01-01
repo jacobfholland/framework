@@ -18,10 +18,10 @@ except Exception as e:
 
 try:
     logger.debug(f"Importing module components: Database")
-    from . import base, crud, database, model, seed
+    from . import base, filter, crud, database, model, seed
 except Exception as e:
     logger.error(f"Failed to initialize the database: {e}")
 
 
-session = None
-db = None
+# session = None
+# db = None

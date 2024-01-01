@@ -5,6 +5,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.inspection import inspect
 
 from app.log.logger import create_logger
+from app.utils.bind import bind_values
 from app.utils.format import snake_case
 from app.utils.generate import generate_uuid
 from app.utils.printable import Printable
@@ -45,21 +46,21 @@ try:
             return snake_case(cls.__name__)
 
         def __init__(self, **kwargs):
-            self.update_values(kwargs)
+            bind_values(self, kwargs)
 
         def get_relationship_names(self):
             """Get a list of relationship attribute names for the model."""
             mapper = inspect(self.__class__)
             return [rel.key for rel in mapper.relationships]
 
-        def update_values(self, values):
-            data = {**self.__dict__, **values}
-            for key, value in data.items():
-                if hasattr(self, key):
-                    setattr(self, key, value)
-                else:
-                    logger.warning(
-                        f"Key {key} does not exist on {self.__class__.__name__} model")
+        # def bind_values(self, values):
+        #     data = {**self.__dict__, **values}
+        #     for key, value in data.items():
+        #         if hasattr(self, key):
+        #             setattr(self, key, value)
+        #         else:
+        #             logger.warning(
+        #                 f"Key {key} does not exist on {self.__class__.__name__} model")
 
         def serialize(self):
             serialized_data = {}
