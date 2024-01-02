@@ -30,6 +30,7 @@ class Application:
         from server.decorator import route
         from auth.user import User
 
+        # TODO: Make this built into a routes() function inside the class that runs on import somehow
         @route(User, "/", methods=["GET"], url_prefix="/")
         def get(cls, request):
             records = cls().get(request.json).all()

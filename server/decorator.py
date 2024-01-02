@@ -42,9 +42,10 @@ def build_response(cls, request, func, *args, **kwargs):
     result = func(cls, request, *args, **kwargs)
     if isinstance(result, Response):
         return result
-    if isinstance(result, str) and result.strip().startswith("<"):
+    if isinstance(result, str) and result.startswith("<"):
+        stripped_result = result.strip()
         return Response(
-            result.strip(),
+            stripped_result,
             content_type="text/html; charset=utf-8"
         )
     return Response(
