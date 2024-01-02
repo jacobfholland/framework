@@ -4,6 +4,7 @@ from sqlalchemy import Column, Integer, String
 from app.log.logger import create_logger
 from app.utils.log import disable_logging
 from database.model import Model
+from server.decorator import route
 
 
 logger = create_logger(__name__)
@@ -36,3 +37,8 @@ class User(Model):
                 "avatar": "/home/jacob/imgs/avatar.jpg"
             }
         ]
+
+    # @route("/", methods=["GET"], url_prefix="/")
+    # def get(cls, request):
+    #     records = cls().get().all()
+    #     return records

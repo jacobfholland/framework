@@ -1,11 +1,12 @@
 from sqlalchemy import and_, or_
 from app.config import conf
 from app.log import logger
+from app.config.environment import Environment
 
 
 class Application:
     def __init__(self) -> None:
-
+        self.env = Environment()
         self.conf = conf
         self.logger = logger
 
@@ -19,19 +20,18 @@ class Application:
         from auth.permission import Permission
         from auth.group import Group
         from auth.user import User
-        from database.seed import Seed
-        logger.critical(
-            "++++++++++++++++++++++++++++++++++++++++++++++++++++++")
         Permission().seed()
         Group().seed()
         User().seed()
-        # name = "User"
-        # permissions = Permission().get().all()
-        # seed = {"name": name, "permissions": permissions}
 
-        # existing = Group().get(name="User").all()
-        # if not existing:
-        #     records_ids = []
-        #     for record in permissions:
-        #         records_ids.append(record.id)
-        #     group = Group().create(**seed)
+    def init_server(self):
+        import server
+        from server.server import Server
+        from server.decorator import route
+        from auth.user import User
+
+        @route(User, "/", methods=["GET"], url_prefix="/")
+        def get(cls, request):
+            records = cls().get().all()
+            return records
+        Server().run()

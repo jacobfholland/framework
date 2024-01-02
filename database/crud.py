@@ -29,28 +29,14 @@ class Crud:
         return log_condition(*conditions)
 
     def query(self, strict=True, **filters):
-        # print("++++++++++++", filters)
         filter_conditions = self.filter(
             strict=strict, **filters)
 
         query = database.session.query(
             self.__class__).filter(filter_conditions)
-        print("++++++++++++", query)
         logger.debug(
             f"Constructed query for {self.__class__.__name__}: {query}")
         return query
-
-    def update_filters(self, *args, **filters):
-        if "deleted_at" not in filters:
-            filters["deleted_at"] = None
-        if len(args) == 1 and isinstance(args[0], dict):
-            filters.update(args[0])
-
-        # for k, v in filters.items():
-        #     if hasattr(v, "__table__"):
-        #         filters[k] = v.id
-
-        return filters
 
     def strip_relationships(self, filters):
         # TODO: Make this only remove model objects, not entire field
@@ -64,7 +50,6 @@ class Crud:
 
     def get(self, *args, func=and_, **filters):
         try:
-
             # filters.update(self.__dict__) # Add values from current model
             filters = update_kwargs(*args, **filters)
             filter = Filter(self.__class__, **filters)

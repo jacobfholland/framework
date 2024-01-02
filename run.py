@@ -8,3 +8,4 @@ db = Database("sqlite:///example.db")
 
 app.init_db(db)
 app.init_auth()
+app.init_server()

@@ -1,4 +1,6 @@
-from datetime import date, datetime
+import base64
+from datetime import date, datetime, time
+import json
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.ext.declarative import declared_attr
@@ -8,18 +10,20 @@ from app.log.logger import create_logger
 from app.utils.bind import bind_values
 from app.utils.format import snake_case
 from app.utils.generate import generate_uuid
+from app.utils.json import serialize
 from app.utils.printable import Printable
 from app.utils.validate import validate_model
-
+from sqlalchemy_serializer import SerializerMixin
 from .base import Base
 from .crud import Crud
 from .seed import Seed
-
+from werkzeug.datastructures import EnvironHeaders
+from werkzeug.datastructures.file_storage import FileStorage
 logger = create_logger(__name__)
 
 try:
 
-    class Model(Base, Crud, Seed, Printable):
+    class Model(Base, SerializerMixin, Crud, Seed, Printable):
         __table_args__ = {'extend_existing': True}
         __abstract__ = True
         _name = __name__
@@ -53,16 +57,6 @@ try:
             """Get a list of relationship attribute names for the model."""
             mapper = inspect(self.__class__)
             return [rel.key for rel in mapper.relationships]
-
-        def serialize(self):
-            serialized_data = {}
-            for column in self.__table__.columns:
-                attribute = getattr(self, column.name)
-                if isinstance(attribute, (datetime, date)):
-                    serialized_data[column.name] = attribute.isoformat()
-                else:
-                    serialized_data[column.name] = attribute
-            return serialized_data
 
 
 except Exception as e:

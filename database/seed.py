@@ -8,6 +8,7 @@ class Seed:
     def seeds(self):
         return []
 
+    @disable_logging
     def seed(self):
         if self._seed_key:
             for record in self.seeds():

@@ -1,6 +1,7 @@
 from app.config import conf
 
-from .external import configure_external_loggers
+from . import external
 from .logger import create_logger
+
 
 logger = create_logger(__name__)

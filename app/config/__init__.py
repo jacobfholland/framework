@@ -11,7 +11,7 @@ except Exception as e:
 
 try:
     from .config import Config
-    conf = Config(env)
+    conf = Config()
 except Exception as e:
     logging.error(f"Failed to bootstrap Config: {e}")
     sys.exit(1)

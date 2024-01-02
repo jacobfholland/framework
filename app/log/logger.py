@@ -12,7 +12,6 @@ def create_logger(name):
     if not os.path.exists(conf.LOG_PATH):
         os.makedirs(conf.LOG_PATH)
     logger = logging.getLogger(name)
-    logger.setLevel(LOG_LEVELS.get(LOG_LEVEL))
     coloredlogs.install(level=LOG_LEVEL, logger=logger, fmt=FORMAT)
     file_handlers = create_handlers(name)
     add_file_handlers(logger, file_handlers)
