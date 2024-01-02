@@ -32,6 +32,6 @@ class Application:
 
         @route(User, "/", methods=["GET"], url_prefix="/")
         def get(cls, request):
-            records = cls().get().all()
+            records = cls().get(request.json).all()
             return records
         Server().run()

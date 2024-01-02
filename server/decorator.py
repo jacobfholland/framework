@@ -1,3 +1,4 @@
+from server.request import Request
 from .server import url_map
 import functools
 import json
@@ -7,7 +8,7 @@ from werkzeug.routing import Rule
 from werkzeug.wrappers import Response
 from app.log.logger import create_logger
 
-from app.utils.json import process_request, serialize
+from app.utils.json import serialize
 
 logger = create_logger(__name__)
 
@@ -37,7 +38,7 @@ def route(cls: type, rule: str, methods: List[str] = ["GET"], url_prefix: str = 
 
 
 def build_response(cls, request, func, *args, **kwargs):
-    request = process_request(request)
+    request = Request(request)
     result = func(cls, request, *args, **kwargs)
     if isinstance(result, Response):
         return result
